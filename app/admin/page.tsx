@@ -320,7 +320,6 @@ function AdminContent() {
             </div>
             <OWButton
               onClick={() => { generateMatches(); setPhase("group") }}
-              disabled={teams.filter(Boolean).length < 2}
             >
               Start Group Stage
             </OWButton>
