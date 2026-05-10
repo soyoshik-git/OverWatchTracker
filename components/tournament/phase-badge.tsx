@@ -3,17 +3,17 @@
 import type { Phase } from "@/lib/tournament-types"
 
 const labels: Record<Phase, string> = {
-  setup: "準備中",
-  group: "グループステージ",
-  playoffs: "プレーオフ",
-  done: "終了",
+  setup: "SETUP",
+  group: "GROUP STAGE",
+  playoffs: "PLAYOFFS",
+  done: "FINAL",
 }
 
 const colors: Record<Phase, string> = {
-  setup: "bg-slate-700 text-slate-300",
-  group: "bg-blue-700 text-blue-100",
-  playoffs: "bg-purple-700 text-purple-100",
-  done: "bg-green-700 text-green-100",
+  setup: "bg-[#555] text-white",
+  group: "bg-[#f4931a] text-white",
+  playoffs: "bg-[#1a1a1a] text-[#f4931a]",
+  done: "bg-emerald-700 text-white",
 }
 
 interface PhaseBadgeProps {
@@ -22,7 +22,10 @@ interface PhaseBadgeProps {
 
 export function PhaseBadge({ phase }: PhaseBadgeProps) {
   return (
-    <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${colors[phase]}`}>
+    <span
+      className={`inline-flex items-center px-4 py-1 text-sm font-black uppercase tracking-widest ${colors[phase]}`}
+      style={{ fontFamily: "var(--font-barlow)" }}
+    >
       {labels[phase]}
     </span>
   )

@@ -22,47 +22,74 @@ function BracketMatch({
   onUpdate?: (s1: number | null, s2: number | null) => void
   readOnly?: boolean
 }) {
-  const t1Name = teams[match.t1] || `チーム${match.t1 + 1}`
-  const t2Name = teams[match.t2] || `チーム${match.t2 + 1}`
+  const t1Name = (teams[match.t1] || `TEAM ${match.t1 + 1}`).toUpperCase()
+  const t2Name = (teams[match.t2] || `TEAM ${match.t2 + 1}`).toUpperCase()
   const finished = match.s1 !== null && match.s2 !== null
+  const t1Win = finished && match.s1! > match.s2!
+  const t2Win = finished && match.s2! > match.s1!
 
   return (
-    <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4 w-full max-w-sm">
-      <div className="text-xs text-slate-400 mb-2 font-semibold uppercase tracking-wide">{label}</div>
-      <div className="flex items-center justify-between gap-3">
-        <span className={`flex-1 text-right text-sm font-semibold ${finished && match.s1! > match.s2! ? "text-yellow-400" : ""}`}>
-          {t1Name}
+    <div className="w-full max-w-2xl">
+      {/* Label */}
+      <div className="bg-[#1a1a1a] px-4 py-1.5 flex items-center gap-3">
+        <div className="w-1 h-4 bg-[#f4931a]" />
+        <span
+          className="text-sm font-black uppercase tracking-widest text-white"
+          style={{ fontFamily: "var(--font-barlow)" }}
+        >
+          {label}
         </span>
-        <div className="flex items-center gap-1.5 font-bold">
+      </div>
+
+      {/* Match rows */}
+      <div>
+        {/* Team 1 */}
+        <div className={`flex items-center justify-between px-4 py-3 border-b border-[#cccccc] ${t1Win ? "bg-[#e0e0e0] border-l-4 border-l-[#f4931a]" : "bg-[#ececec]"}`}>
+          <span
+            className={`text-2xl font-black uppercase tracking-wide ${t1Win ? "text-[#1a1a1a]" : "text-[#777]"}`}
+            style={{ fontFamily: "var(--font-barlow)" }}
+          >
+            {t1Name}
+          </span>
           {readOnly || !onUpdate ? (
-            <span className="text-slate-300 text-lg">
-              {match.s1 ?? "-"} : {match.s2 ?? "-"}
+            <span className={`text-2xl font-black w-8 text-center ${t1Win ? "text-[#f4931a]" : "text-[#1a1a1a]"}`}>
+              {match.s1 ?? "-"}
             </span>
           ) : (
-            <>
-              <input
-                type="number"
-                min={0}
-                max={99}
-                value={match.s1 ?? ""}
-                onChange={(e) => onUpdate(e.target.value === "" ? null : Number(e.target.value), match.s2)}
-                className="w-12 rounded border border-slate-600 bg-slate-900 px-1 py-0.5 text-center text-sm"
-              />
-              <span className="text-slate-500">:</span>
-              <input
-                type="number"
-                min={0}
-                max={99}
-                value={match.s2 ?? ""}
-                onChange={(e) => onUpdate(match.s1, e.target.value === "" ? null : Number(e.target.value))}
-                className="w-12 rounded border border-slate-600 bg-slate-900 px-1 py-0.5 text-center text-sm"
-              />
-            </>
+            <input
+              type="number"
+              min={0}
+              max={99}
+              value={match.s1 ?? ""}
+              onChange={(e) => onUpdate(e.target.value === "" ? null : Number(e.target.value), match.s2)}
+              className="w-12 bg-[#ddd] text-[#1a1a1a] text-center text-xl font-black rounded border border-[#cccccc] focus:outline-none focus:ring-1 focus:ring-[#f4931a]"
+            />
           )}
         </div>
-        <span className={`flex-1 text-sm font-semibold ${finished && match.s2! > match.s1! ? "text-yellow-400" : ""}`}>
-          {t2Name}
-        </span>
+
+        {/* Team 2 */}
+        <div className={`flex items-center justify-between px-4 py-3 ${t2Win ? "bg-[#e0e0e0] border-l-4 border-l-[#f4931a]" : "bg-[#e8e8e8]"}`}>
+          <span
+            className={`text-2xl font-black uppercase tracking-wide ${t2Win ? "text-[#1a1a1a]" : "text-[#777]"}`}
+            style={{ fontFamily: "var(--font-barlow)" }}
+          >
+            {t2Name}
+          </span>
+          {readOnly || !onUpdate ? (
+            <span className={`text-2xl font-black w-8 text-center ${t2Win ? "text-[#f4931a]" : "text-[#1a1a1a]"}`}>
+              {match.s2 ?? "-"}
+            </span>
+          ) : (
+            <input
+              type="number"
+              min={0}
+              max={99}
+              value={match.s2 ?? ""}
+              onChange={(e) => onUpdate(match.s1, e.target.value === "" ? null : Number(e.target.value))}
+              className="w-12 bg-[#ddd] text-[#1a1a1a] text-center text-xl font-black rounded border border-[#cccccc] focus:outline-none focus:ring-1 focus:ring-[#f4931a]"
+            />
+          )}
+        </div>
       </div>
     </div>
   )
@@ -70,16 +97,16 @@ function BracketMatch({
 
 export function PlayoffBracket({ playoffs, teams, onUpdate, readOnly = false }: PlayoffBracketProps) {
   return (
-    <div className="flex flex-col gap-4 items-center">
+    <div className="flex flex-col gap-6 items-center">
       <BracketMatch
-        label="決勝"
+        label="Grand Finals"
         match={playoffs.finals}
         teams={teams}
         onUpdate={onUpdate ? (s1, s2) => onUpdate("finals", s1, s2) : undefined}
         readOnly={readOnly}
       />
       <BracketMatch
-        label="3位決定戦"
+        label="3rd Place Match"
         match={playoffs.third}
         teams={teams}
         onUpdate={onUpdate ? (s1, s2) => onUpdate("third", s1, s2) : undefined}

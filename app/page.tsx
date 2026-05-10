@@ -20,8 +20,10 @@ function ViewerContent() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-300">
-        読み込み中...
+      <div className="flex min-h-screen items-center justify-center bg-[#e8e8e8]">
+        <span className="text-2xl font-black uppercase tracking-widest text-[#888]" style={{ fontFamily: "var(--font-barlow)" }}>
+          Loading...
+        </span>
       </div>
     )
   }
@@ -29,24 +31,35 @@ function ViewerContent() {
   const standings = calcStandings(teams, matches)
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-6">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-white">OW2 トーナメント</h1>
+    <div className="min-h-screen bg-[#e8e8e8]">
+      {/* Header */}
+      <header className="bg-[#1a1a1a] px-6 py-4">
+        <div className="max-w-3xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-8 bg-[#f4931a]" />
+            <h1
+              className="text-2xl font-black uppercase tracking-widest text-white"
+              style={{ fontFamily: "var(--font-barlow)" }}
+            >
+              Overwatch Champions Series
+            </h1>
+          </div>
           <PhaseBadge phase={phase} />
         </div>
+      </header>
 
+      <div className="max-w-3xl mx-auto py-8 px-4 space-y-10">
         {(phase === "group" || phase === "playoffs" || phase === "done") && (
           <section>
-            <h2 className="text-lg font-semibold text-slate-300 mb-3">順位表</h2>
+            <SectionTitle>Standings</SectionTitle>
             <StandingsTable standings={standings} />
           </section>
         )}
 
-        {phase === "group" && (
+        {phase === "group" && matches.length > 0 && (
           <section>
-            <h2 className="text-lg font-semibold text-slate-300 mb-3">グループステージ</h2>
-            <div className="space-y-2">
+            <SectionTitle>Matches</SectionTitle>
+            <div>
               {matches.map((m) => (
                 <MatchCard key={m.id} match={m} teams={teams} readOnly />
               ))}
@@ -56,17 +69,34 @@ function ViewerContent() {
 
         {(phase === "playoffs" || phase === "done") && (
           <section>
-            <h2 className="text-lg font-semibold text-slate-300 mb-3">プレーオフ</h2>
+            <SectionTitle>Playoffs</SectionTitle>
             <PlayoffBracket playoffs={playoffs} teams={teams} readOnly />
           </section>
         )}
 
         {phase === "setup" && (
-          <div className="text-center text-slate-500 py-16">
-            トーナメント開始をお待ちください
+          <div className="flex flex-col items-center justify-center py-24 gap-3">
+            <div className="w-16 h-1 bg-[#f4931a]" />
+            <p className="text-xl font-black uppercase tracking-widest text-[#aaa]" style={{ fontFamily: "var(--font-barlow)" }}>
+              Tournament Starting Soon
+            </p>
           </div>
         )}
       </div>
+    </div>
+  )
+}
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-3 mb-4">
+      <div className="w-1 h-6 bg-[#f4931a]" />
+      <h2
+        className="text-base font-black uppercase tracking-widest text-[#444444]"
+        style={{ fontFamily: "var(--font-barlow)" }}
+      >
+        {children}
+      </h2>
     </div>
   )
 }

@@ -4,35 +4,87 @@ import type { TeamStanding } from "@/lib/tournament-types"
 
 interface StandingsTableProps {
   standings: TeamStanding[]
+  playoffCutoff?: number
 }
 
-export function StandingsTable({ standings }: StandingsTableProps) {
+export function StandingsTable({ standings, playoffCutoff = 4 }: StandingsTableProps) {
   return (
-    <div className="rounded-lg border border-slate-700 overflow-hidden">
-      <table className="w-full text-sm">
-        <thead className="bg-slate-800 text-slate-300">
-          <tr>
-            <th className="px-4 py-2 text-left">#</th>
-            <th className="px-4 py-2 text-left">チーム</th>
-            <th className="px-4 py-2 text-center">W</th>
-            <th className="px-4 py-2 text-center">L</th>
-            <th className="px-4 py-2 text-center">±</th>
-          </tr>
-        </thead>
-        <tbody>
-          {standings.map((s, i) => (
-            <tr key={s.index} className={i % 2 === 0 ? "bg-slate-900" : "bg-slate-800/50"}>
-              <td className="px-4 py-2 text-slate-400">{i + 1}</td>
-              <td className="px-4 py-2 font-medium">{s.name || `チーム${s.index + 1}`}</td>
-              <td className="px-4 py-2 text-center text-green-400">{s.wins}</td>
-              <td className="px-4 py-2 text-center text-red-400">{s.losses}</td>
-              <td className={`px-4 py-2 text-center ${s.diff > 0 ? "text-green-400" : s.diff < 0 ? "text-red-400" : "text-slate-400"}`}>
+    <div className="w-full">
+      {/* Header */}
+      <div className="flex items-center px-4 pb-2 text-xs font-800 uppercase tracking-widest text-[#888]">
+        <span className="w-10" />
+        <span className="flex-1" />
+        <span className="w-12 text-center">W</span>
+        <span className="w-12 text-center">L</span>
+        <span className="w-16 text-center">+/-</span>
+      </div>
+
+      {standings.map((s, i) => {
+        const isPlayoffCutoff = i === playoffCutoff - 1
+        const belowCutoff = i >= playoffCutoff
+
+        return (
+          <div key={s.index}>
+            <div
+              className={`flex items-center px-4 py-3 transition-colors ${
+                belowCutoff
+                  ? "opacity-70"
+                  : "border-l-4 border-[#f4931a]"
+              } ${i % 2 === 0 ? "bg-[#ececec]" : "bg-[#e4e4e4]"}`}
+            >
+              {/* Rank */}
+              <span
+                className="w-10 text-3xl font-black italic leading-none text-[#1a1a1a]"
+                style={{ fontFamily: "var(--font-barlow)" }}
+              >
+                {i + 1}
+              </span>
+
+              {/* Team name */}
+              <span
+                className="flex-1 text-2xl font-black uppercase tracking-wide text-[#1a1a1a]"
+                style={{ fontFamily: "var(--font-barlow)" }}
+              >
+                {s.name || `TEAM ${s.index + 1}`}
+              </span>
+
+              {/* W */}
+              <span className="w-12 text-center text-2xl font-bold text-[#1a1a1a]">
+                {s.wins}
+              </span>
+
+              {/* L */}
+              <span className="w-12 text-center text-2xl font-bold text-[#1a1a1a]">
+                {s.losses}
+              </span>
+
+              {/* +/- */}
+              <span
+                className={`w-16 text-center text-2xl font-black ${
+                  s.diff > 0
+                    ? "text-emerald-600"
+                    : s.diff < 0
+                    ? "text-red-600"
+                    : "text-[#888]"
+                }`}
+              >
                 {s.diff > 0 ? `+${s.diff}` : s.diff}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </span>
+            </div>
+
+            {/* Cutoff divider */}
+            {isPlayoffCutoff && (
+              <div className="flex items-center gap-3 px-4 py-2 bg-[#1a1a1a]">
+                <div className="flex-1 h-px bg-[#444]" />
+                <span className="text-xs font-black uppercase tracking-widest text-[#888]">
+                  Advance to Playoffs
+                </span>
+                <div className="flex-1 h-px bg-[#444]" />
+              </div>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }

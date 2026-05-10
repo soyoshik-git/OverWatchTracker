@@ -6,7 +6,6 @@ import { StandingsTable } from "@/components/tournament/standings-table"
 import { MatchCard } from "@/components/tournament/match-card"
 import { PlayoffBracket } from "@/components/tournament/playoff-bracket"
 import { PhaseBadge } from "@/components/tournament/phase-badge"
-import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -14,9 +13,53 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { calcStandings } from "@/lib/utils"
+
+function OWButton({
+  children,
+  onClick,
+  disabled,
+  variant = "primary",
+}: {
+  children: React.ReactNode
+  onClick?: () => void
+  disabled?: boolean
+  variant?: "primary" | "outline"
+}) {
+  const base = "px-5 py-2 text-sm font-black uppercase tracking-widest transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+  const styles =
+    variant === "primary"
+      ? "bg-[#f4931a] text-white hover:bg-orange-500"
+      : "border border-[#cccccc] text-[#444444] hover:bg-[#ddd]"
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={`${base} ${styles}`}
+      style={{ fontFamily: "var(--font-barlow)" }}
+    >
+      {children}
+    </button>
+  )
+}
+
+function SectionTitle({ children, action }: { children: React.ReactNode; action?: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center gap-3">
+        <div className="w-1 h-6 bg-[#f4931a]" />
+        <h2
+          className="text-base font-black uppercase tracking-widest text-[#444444]"
+          style={{ fontFamily: "var(--font-barlow)" }}
+        >
+          {children}
+        </h2>
+      </div>
+      {action}
+    </div>
+  )
+}
 
 function AuthModal({ onSuccess }: { onSuccess: () => void }) {
   const [password, setPassword] = useState("")
@@ -48,30 +91,45 @@ function AuthModal({ onSuccess }: { onSuccess: () => void }) {
 
   return (
     <Dialog open>
-      <DialogContent className="bg-slate-900 border-slate-700 text-slate-100">
-        <DialogHeader>
-          <DialogTitle>管理者認証</DialogTitle>
-          <DialogDescription className="text-slate-400">
-            管理画面にアクセスするにはパスワードを入力してください
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-slate-300">パスワード</Label>
-            <Input
-              id="password"
+      <DialogContent className="bg-[#1a1a1a] border-[#333] text-white p-0 overflow-hidden max-w-sm">
+        <div className="h-1 bg-[#f4931a] w-full" />
+        <div className="p-6">
+          <DialogHeader className="mb-4">
+            <DialogTitle
+              className="text-xl font-black uppercase tracking-widest text-white"
+              style={{ fontFamily: "var(--font-barlow)" }}
+            >
+              Admin Access
+            </DialogTitle>
+            <DialogDescription className="text-[#888] text-sm">
+              パスワードを入力してください
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="bg-slate-800 border-slate-600 text-slate-100"
               autoFocus
+              placeholder="Password"
+              className="w-full bg-[#222] border border-[#444] text-white px-3 py-2 text-sm font-bold tracking-wider focus:outline-none focus:border-[#f4931a]"
+              style={{ fontFamily: "var(--font-barlow)" }}
             />
-          </div>
-          {error && <p className="text-red-400 text-sm">{error}</p>}
-          <Button type="submit" disabled={loading || !password} className="w-full">
-            {loading ? "確認中..." : "ログイン"}
-          </Button>
-        </form>
+            {error && (
+              <p className="text-red-400 text-sm font-bold uppercase tracking-wide" style={{ fontFamily: "var(--font-barlow)" }}>
+                {error}
+              </p>
+            )}
+            <button
+              type="submit"
+              disabled={loading || !password}
+              className="w-full bg-[#f4931a] text-white py-2 text-sm font-black uppercase tracking-widest hover:bg-orange-500 transition-colors disabled:opacity-40"
+              style={{ fontFamily: "var(--font-barlow)" }}
+            >
+              {loading ? "Verifying..." : "Login"}
+            </button>
+          </form>
+        </div>
       </DialogContent>
     </Dialog>
   )
@@ -87,8 +145,10 @@ function AdminContent() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-300">
-        読み込み中...
+      <div className="flex min-h-screen items-center justify-center bg-[#e8e8e8]">
+        <span className="text-2xl font-black uppercase tracking-widest text-[#888]" style={{ fontFamily: "var(--font-barlow)" }}>
+          Loading...
+        </span>
       </div>
     )
   }
@@ -96,62 +156,82 @@ function AdminContent() {
   const top4 = standings.slice(0, 4)
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-6">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-white">管理画面</h1>
+    <div className="min-h-screen bg-[#e8e8e8]">
+      {/* Header */}
+      <header className="bg-[#1a1a1a] px-6 py-4">
+        <div className="max-w-3xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-8 bg-[#f4931a]" />
+            <h1
+              className="text-2xl font-black uppercase tracking-widest text-white"
+              style={{ fontFamily: "var(--font-barlow)" }}
+            >
+              Admin Panel
+            </h1>
+          </div>
           <PhaseBadge phase={phase} />
         </div>
+      </header>
 
-        {/* Setup Phase */}
+      <div className="max-w-3xl mx-auto py-8 px-4 space-y-10">
+        {/* Setup */}
         {phase === "setup" && (
-          <section className="space-y-4">
-            <h2 className="text-lg font-semibold text-slate-300">チーム設定</h2>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <section>
+            <SectionTitle>Team Setup</SectionTitle>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 mb-4">
               {teams.map((name, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <span className="text-slate-400 w-6">{i + 1}.</span>
-                  <Input
+                <div key={i} className="flex items-center gap-2 bg-[#ececec] px-3 py-2">
+                  <span
+                    className="text-lg font-black text-[#aaa] w-6"
+                    style={{ fontFamily: "var(--font-barlow)" }}
+                  >
+                    {i + 1}
+                  </span>
+                  <input
                     value={name}
                     onChange={(e) => setTeamName(i, e.target.value)}
-                    placeholder={`チーム${i + 1}`}
-                    className="bg-slate-800 border-slate-600 text-slate-100"
+                    placeholder={`TEAM ${i + 1}`}
+                    className="flex-1 bg-transparent border-b border-[#ccc] text-[#1a1a1a] font-black uppercase tracking-wide text-lg focus:outline-none focus:border-[#f4931a] placeholder:text-[#bbb]"
+                    style={{ fontFamily: "var(--font-barlow)" }}
                   />
                 </div>
               ))}
             </div>
-            <Button
+            <OWButton
               onClick={() => { generateMatches(); setPhase("group") }}
               disabled={teams.filter(Boolean).length < 2}
             >
-              グループステージ開始
-            </Button>
+              Start Group Stage
+            </OWButton>
           </section>
         )}
 
-        {/* Group Phase */}
+        {/* Group */}
         {phase === "group" && (
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-slate-300">グループステージ</h2>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  if (top4.length >= 4) {
-                    setPlayoffTeams(
-                      [top4[0].index, top4[1].index],
-                      [top4[2].index, top4[3].index]
-                    )
-                  }
-                  setPhase("playoffs")
-                }}
-                className="border-slate-600 text-slate-300 hover:bg-slate-800"
-              >
-                プレーオフへ進む
-              </Button>
-            </div>
+          <section>
+            <SectionTitle
+              action={
+                <OWButton
+                  variant="outline"
+                  onClick={() => {
+                    if (top4.length >= 4) {
+                      setPlayoffTeams(
+                        [top4[0].index, top4[1].index],
+                        [top4[2].index, top4[3].index]
+                      )
+                    }
+                    setPhase("playoffs")
+                  }}
+                >
+                  → Playoffs
+                </OWButton>
+              }
+            >
+              Group Stage
+            </SectionTitle>
             <StandingsTable standings={standings} />
-            <div className="space-y-2">
+            <div className="mt-6">
+              <SectionTitle>Matches</SectionTitle>
               {matches.map((m) => (
                 <MatchCard key={m.id} match={m} teams={teams} onUpdate={updateMatch} />
               ))}
@@ -159,21 +239,20 @@ function AdminContent() {
           </section>
         )}
 
-        {/* Playoffs Phase */}
+        {/* Playoffs */}
         {(phase === "playoffs" || phase === "done") && (
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-slate-300">プレーオフ</h2>
-              {phase === "playoffs" && (
-                <Button
-                  variant="outline"
-                  onClick={() => setPhase("done")}
-                  className="border-slate-600 text-slate-300 hover:bg-slate-800"
-                >
-                  終了
-                </Button>
-              )}
-            </div>
+          <section>
+            <SectionTitle
+              action={
+                phase === "playoffs" ? (
+                  <OWButton variant="outline" onClick={() => setPhase("done")}>
+                    End Tournament
+                  </OWButton>
+                ) : undefined
+              }
+            >
+              Playoffs
+            </SectionTitle>
             <PlayoffBracket
               playoffs={playoffs}
               teams={teams}
@@ -181,12 +260,6 @@ function AdminContent() {
               readOnly={phase === "done"}
             />
           </section>
-        )}
-
-        {phase === "done" && (
-          <div className="text-center text-slate-400 py-4">
-            トーナメント終了
-          </div>
         )}
       </div>
     </div>
@@ -213,8 +286,10 @@ export default function AdminPage() {
 
   if (checking) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-300">
-        確認中...
+      <div className="flex min-h-screen items-center justify-center bg-[#e8e8e8]">
+        <span className="text-2xl font-black uppercase tracking-widest text-[#888]" style={{ fontFamily: "var(--font-barlow)" }}>
+          Verifying...
+        </span>
       </div>
     )
   }
