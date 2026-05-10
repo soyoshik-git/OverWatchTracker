@@ -2,6 +2,8 @@
 
 import type { TeamStanding } from "@/lib/tournament-types"
 
+const JP_RE = /[぀-ヿ一-鿿]/
+
 interface StandingsTableProps {
   standings: TeamStanding[]
   playoffCutoff?: number
@@ -41,11 +43,22 @@ export function StandingsTable({ standings, playoffCutoff = 4 }: StandingsTableP
               </span>
 
               {/* Team name */}
-              <span
-                className="flex-1 text-2xl font-black uppercase tracking-wide text-[#1a1a1a]"
-                style={{ fontFamily: "var(--font-barlow)" }}
-              >
-                {s.name || `TEAM ${s.index + 1}`}
+              <span className="flex-1 overflow-hidden">
+                {(() => {
+                  const name = s.name || `TEAM ${s.index + 1}`
+                  const isJP = JP_RE.test(name)
+                  return (
+                    <span
+                      className="text-2xl font-black tracking-wide text-[#1a1a1a]"
+                      style={{
+                        fontFamily: "var(--font-barlow)",
+                        ...(isJP ? { display: "inline-block", transform: "scaleX(0.82)", transformOrigin: "left center" } : {}),
+                      }}
+                    >
+                      {name}
+                    </span>
+                  )
+                })()}
               </span>
 
               {/* W */}

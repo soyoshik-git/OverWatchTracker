@@ -194,7 +194,7 @@ function TeamNameEditor({ teams, setTeamName }: {
                 value={name}
                 onChange={(e) => setTeamName(i, e.target.value)}
                 placeholder={`TEAM ${i + 1}`}
-                className="flex-1 bg-transparent border-b border-[#ccc] text-[#1a1a1a] font-black uppercase tracking-wide text-base focus:outline-none focus:border-[#f4931a] placeholder:text-[#bbb]"
+                className="flex-1 bg-transparent border-b border-[#ccc] text-[#1a1a1a] font-black tracking-wide text-base focus:outline-none focus:border-[#f4931a] placeholder:text-[#bbb]"
                 style={{ fontFamily: "var(--font-barlow)" }}
               />
             </div>
@@ -312,7 +312,7 @@ function AdminContent() {
                     value={name}
                     onChange={(e) => setTeamName(i, e.target.value)}
                     placeholder={`TEAM ${i + 1}`}
-                    className="flex-1 bg-transparent border-b border-[#ccc] text-[#1a1a1a] font-black uppercase tracking-wide text-lg focus:outline-none focus:border-[#f4931a] placeholder:text-[#bbb]"
+                    className="flex-1 bg-transparent border-b border-[#ccc] text-[#1a1a1a] font-black tracking-wide text-lg focus:outline-none focus:border-[#f4931a] placeholder:text-[#bbb]"
                     style={{ fontFamily: "var(--font-barlow)" }}
                   />
                 </div>
