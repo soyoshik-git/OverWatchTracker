@@ -6,15 +6,17 @@ interface MatchCardProps {
   match: Match
   teams: string[]
   onUpdate?: (id: string, s1: number | null, s2: number | null) => void
+  onClearScore?: (id: string) => void
   readOnly?: boolean
 }
 
-export function MatchCard({ match, teams, onUpdate, readOnly = false }: MatchCardProps) {
+export function MatchCard({ match, teams, onUpdate, onClearScore, readOnly = false }: MatchCardProps) {
   const t1Name = (teams[match.t1] || `TEAM ${match.t1 + 1}`).toUpperCase()
   const t2Name = (teams[match.t2] || `TEAM ${match.t2 + 1}`).toUpperCase()
   const finished = match.s1 !== null && match.s2 !== null
   const t1Win = finished && match.s1! > match.s2!
   const t2Win = finished && match.s2! > match.s1!
+  const canClear = !readOnly && onClearScore && finished
 
   return (
     <div className="flex items-center bg-[#ececec] border-b border-[#cccccc]">
@@ -29,7 +31,7 @@ export function MatchCard({ match, teams, onUpdate, readOnly = false }: MatchCar
       </div>
 
       {/* Score */}
-      <div className="flex items-center gap-1 px-4 py-2 bg-[#1a1a1a] min-w-[120px] justify-center">
+      <div className="flex items-center gap-1 px-3 py-2 bg-[#1a1a1a] min-w-[140px] justify-center relative">
         {readOnly || !onUpdate ? (
           <>
             <span className={`text-2xl font-black w-8 text-center ${t1Win ? "text-[#f4931a]" : "text-white"}`}>
@@ -59,6 +61,15 @@ export function MatchCard({ match, teams, onUpdate, readOnly = false }: MatchCar
               onChange={(e) => onUpdate(match.id, match.s1, e.target.value === "" ? null : Number(e.target.value))}
               className="w-10 bg-[#333] text-white text-center text-xl font-black rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#f4931a]"
             />
+            {canClear && (
+              <button
+                onClick={() => onClearScore(match.id)}
+                title="スコアをクリア"
+                className="ml-1 text-[#666] hover:text-red-400 text-lg font-black leading-none transition-colors"
+              >
+                ×
+              </button>
+            )}
           </>
         )}
       </div>

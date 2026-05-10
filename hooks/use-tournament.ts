@@ -18,8 +18,11 @@ export interface TournamentActions {
   setTeamName: (index: number, name: string) => void
   generateMatches: () => void
   updateMatch: (id: string, s1: number | null, s2: number | null) => void
+  clearMatchScore: (id: string) => void
   updatePlayoff: (match: "finals" | "third", s1: number | null, s2: number | null) => void
   setPlayoffTeams: (finals: [number, number], third: [number, number]) => void
+  goBack: () => void
+  resetTournament: () => void
   refreshState: () => Promise<void>
   isLoading: boolean
 }
@@ -104,6 +107,13 @@ export function useTournament(isAdmin: boolean = false): TournamentState & Tourn
     }))
   }, [])
 
+  const clearMatchScore = useCallback((id: string) => {
+    setState((prev) => ({
+      ...prev,
+      matches: prev.matches.map((m) => (m.id === id ? { ...m, s1: null, s2: null } : m)),
+    }))
+  }, [])
+
   const updatePlayoff = useCallback((match: "finals" | "third", s1: number | null, s2: number | null) => {
     setState((prev) => ({
       ...prev,
@@ -124,6 +134,25 @@ export function useTournament(isAdmin: boolean = false): TournamentState & Tourn
     }))
   }, [])
 
+  const goBack = useCallback(() => {
+    setState((prev) => {
+      if (prev.phase === "group") {
+        return { ...prev, phase: "setup", matches: [] }
+      }
+      if (prev.phase === "playoffs") {
+        return { ...prev, phase: "group" }
+      }
+      if (prev.phase === "done") {
+        return { ...prev, phase: "playoffs" }
+      }
+      return prev
+    })
+  }, [])
+
+  const resetTournament = useCallback(() => {
+    setState(initialState)
+  }, [])
+
   const refreshState = useCallback(async () => {
     const s = await fetchState()
     setState(s)
@@ -135,8 +164,11 @@ export function useTournament(isAdmin: boolean = false): TournamentState & Tourn
     setTeamName,
     generateMatches,
     updateMatch,
+    clearMatchScore,
     updatePlayoff,
     setPlayoffTeams,
+    goBack,
+    resetTournament,
     refreshState,
     isLoading,
   }
